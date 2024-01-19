@@ -42,7 +42,7 @@ impl PixelDisplay {
         };
     }
 
-    pub fn draw_image(&mut self, image: Image<'_, Bmp<'_, Rgb888>>, _point: Point) {
+    pub fn draw_image(&mut self, image: Image<'_, Bmp<'_, Rgb888>>, point: Point) {
         match self.output {
             DisplayOutput::Real(ref mut c, _) => image.draw(c).ok(),
             DisplayOutput::Simulator(ref mut s, _) => image.draw(s).ok(),

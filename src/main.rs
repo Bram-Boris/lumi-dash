@@ -2,11 +2,11 @@ mod apps;
 mod modules;
 mod pixel_display;
 
-use crate::pixel_display::pixel_display::PixelDisplay;
-#[cfg(feature = "simulator")]
+#[cfg(feature = "simulated")]
 use embedded_graphics_simulator::SimulatorEvent;
 
-#[cfg(feature = "simulator")]
+use crate::pixel_display::pixel_display::PixelDisplay;
+
 fn main() -> Result<(), core::convert::Infallible> {
     use crate::{
         apps::{app::App, main_menu::MainMenu},
@@ -15,7 +15,12 @@ fn main() -> Result<(), core::convert::Infallible> {
 
     let mut apps = Vec::<Box<dyn App>>::new();
     apps.push(Box::new(MainMenu::new()));
+
+    #[cfg(feature = "simulated")]
     let mut pixel_display = PixelDisplay::new(32, 64, DisplayMode::Simulated);
+
+    #[cfg(not(feature = "simulated"))]
+    let mut pixel_display = PixelDisplay::new(32, 64, DisplayMode::Real);
 
     'running: loop {
         pixel_display.update();
@@ -30,6 +35,7 @@ fn main() -> Result<(), core::convert::Infallible> {
             }
             DisplayOutput::Simulator(ref s, ref mut w) => {
                 w.update(&s);
+                #[cfg(feature = "simulated")]
                 if w.events().any(|e| e == SimulatorEvent::Quit) {
                     break 'running Ok(());
                 }
