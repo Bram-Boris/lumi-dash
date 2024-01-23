@@ -37,7 +37,7 @@ impl<'a> MainMenu<'a> {
     }
 }
 
-impl<'a> App for MainMenu<'_> {
+impl App for MainMenu<'_> {
     fn draw(&self, display: &mut PixelDisplay) {
         let current = self.backgrounds.front().unwrap();
         self.backgrounds

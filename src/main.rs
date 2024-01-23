@@ -1,20 +1,16 @@
 mod apps;
 mod modules;
 mod pixel_display;
-use crate::apps::launcher::Input;
 
 #[cfg(feature = "simulated")]
 use embedded_graphics_simulator::sdl2::Keycode;
 #[cfg(feature = "simulated")]
 use embedded_graphics_simulator::SimulatorEvent;
 
+use crate::apps::launcher::Input;
 use crate::{apps::launcher::Launcher, pixel_display::pixel_display::PixelDisplay};
-
 fn main() -> Result<(), core::convert::Infallible> {
-    use crate::{
-        apps::{app::App, main_menu::MainMenu},
-        pixel_display::pixel_display::{DisplayMode, DisplayOutput},
-    };
+    use crate::pixel_display::pixel_display::{DisplayMode, DisplayOutput};
 
     #[cfg(feature = "simulated")]
     let mut pixel_display = PixelDisplay::new(32, 64, DisplayMode::Simulated);
@@ -23,7 +19,6 @@ fn main() -> Result<(), core::convert::Infallible> {
     let mut pixel_display = PixelDisplay::new(32, 64, DisplayMode::Real);
 
     let mut launcher = Launcher::new();
-
     'running: loop {
         pixel_display.update();
         launcher.draw(&mut pixel_display);

@@ -1,8 +1,7 @@
 use std::collections::VecDeque;
 
+use super::{app::App, main_menu::MainMenu, spotify::Spotify};
 use crate::pixel_display::pixel_display::PixelDisplay;
-
-use super::{app::App, main_menu::MainMenu};
 
 pub struct Launcher {
     apps: VecDeque<Box<dyn App>>,
@@ -19,7 +18,10 @@ impl Launcher {
     pub fn new() -> Self {
         let mut apps = VecDeque::<Box<dyn App>>::new();
         let main: Box<MainMenu<'_>> = Box::new(MainMenu::new());
+        let spotify: Box<Spotify> = Box::new(Spotify::new());
+
         apps.push_back(main);
+        apps.push_back(spotify);
 
         Self { apps }
     }
