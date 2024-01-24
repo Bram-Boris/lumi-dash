@@ -25,8 +25,8 @@ impl<'a> MainMenu<'a> {
         let date: Date = Date {};
 
         let mut backgrounds: VecDeque<(Image<'a>, Point, Point)> = VecDeque::new();
-        backgrounds.push_back((Image::new(CLOUD), Point::new(32, 6), Point::new(48, 6)));
         backgrounds.push_back((Image::new(SAKURA), Point::new(2, 6), Point::new(23, 6)));
+        backgrounds.push_back((Image::new(CLOUD), Point::new(32, 6), Point::new(48, 6)));
         backgrounds.push_back((Image::new(FOREST), Point::new(2, 6), Point::new(23, 6)));
 
         Self {
@@ -38,7 +38,7 @@ impl<'a> MainMenu<'a> {
 }
 
 impl App for MainMenu<'_> {
-    fn draw(&self, display: &mut PixelDisplay) {
+    fn draw(&mut self, display: &mut PixelDisplay) {
         let current = self.backgrounds.front().unwrap();
         self.backgrounds
             .front()

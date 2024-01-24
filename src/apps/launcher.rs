@@ -26,8 +26,8 @@ impl Launcher {
         Self { apps }
     }
 
-    pub fn draw(&self, display: &mut PixelDisplay) {
-        self.apps.front().unwrap().draw(display);
+    pub fn draw(&mut self, display: &mut PixelDisplay) {
+        self.apps.front_mut().unwrap().draw(display);
     }
 
     pub fn handle_input(&mut self, input: Input) {
