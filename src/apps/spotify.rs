@@ -24,6 +24,7 @@ pub struct Spotify {
     current_song: Option<FullTrack>,
     duration: Option<Duration>,
     progress: Option<Duration>,
+    device_id: Option<String>,
     cover_raw: Option<Vec<u8>>,
     last_update: Instant,
     paused: bool,
@@ -36,7 +37,7 @@ impl Spotify {
 
         let oauth = OAuth {
             redirect_uri: "https://localhost:8888/callback".to_string(),
-            scopes: scopes!("user-read-playback-state"),
+            scopes: scopes!("user-read-playback-state", "user-modify-playback-state"),
             ..Default::default()
         };
 
@@ -45,17 +46,27 @@ impl Spotify {
             ..Default::default()
         };
 
-        let token = Token::from_cache(PathBuf::from(".spotify_token_cache.json")).unwrap();
-        let expired = token.is_expired();
+        let token: Option<Token> =
+            match Token::from_cache(PathBuf::from(".spotify_token_cache.json")) {
+                Ok(e) => {
+                    if !e.is_expired() {
+                        Some(e);
+                    }
+                    None
+                }
+                Err(_) => None,
+            };
+
         let spotify;
-        if !expired {
-            spotify = AuthCodeSpotify::from_token(token);
-        } else {
-            spotify = AuthCodeSpotify::with_config(creds, oauth, config);
-            let url = spotify.get_authorize_url(false).unwrap();
-            spotify
-                .prompt_for_token(&url)
-                .expect("couldn't authenticate successfully");
+        match token {
+            Some(t) => spotify = AuthCodeSpotify::from_token(t),
+            None => {
+                spotify = AuthCodeSpotify::with_config(creds, oauth, config);
+                let url = spotify.get_authorize_url(false).unwrap();
+                spotify
+                    .prompt_for_token(&url)
+                    .expect("couldn't authenticate successfully");
+            }
         }
 
         let market = Market::Country(Country::Netherlands);
@@ -65,6 +76,7 @@ impl Spotify {
             current_song: None,
             duration: None,
             progress: None,
+            device_id: None,
             paused: true,
             last_update: Instant::now(),
             cover_raw: None,
@@ -117,7 +129,11 @@ impl Spotify {
         {
             Ok(p) => {
                 self.progress = match p {
-                    Some(playbackcontext) => playbackcontext.progress,
+                    Some(ref playbackcontext) => playbackcontext.progress,
+                    None => None,
+                };
+                self.device_id = match p {
+                    Some(playbackcontext) => playbackcontext.device.id,
                     None => None,
                 }
             }
@@ -142,6 +158,33 @@ impl Spotify {
         bmpraw
     }
 
+    fn next_track(&mut self) {
+        self.spotify.next_track(self.device_id.as_deref()).unwrap();
+        self.update_song();
+    }
+
+    fn previous_track(&mut self) {
+        self.spotify
+            .previous_track(self.device_id.as_deref())
+            .unwrap();
+        self.update_song();
+    }
+
+    fn pause_playback(&mut self) {
+        match self.paused {
+            true => self
+                .spotify
+                .resume_playback(self.device_id.as_deref(), None)
+                .unwrap(),
+            false => self
+                .spotify
+                .pause_playback(self.device_id.as_deref())
+                .unwrap(),
+        }
+
+        self.update_song();
+    }
+
     fn draw_progress_bar(&mut self, display: &mut PixelDisplay) {
         let duration = Line {
             start: Point::new(36, 17),
@@ -156,15 +199,13 @@ impl Spotify {
         let current_seconds = self.progress.unwrap().num_seconds() as f32;
         let ratio: f32 = current_seconds / max_seconds;
         let adjusted_progress = ((ratio * (59.0 - 36.0)) + 36.0).round() as i32;
-        if adjusted_progress > 33 {
-            let progress = Line {
-                start: Point::new(36, 17),
-                end: Point::new(adjusted_progress.try_into().unwrap(), 17),
-            };
-            let style = PrimitiveStyle::with_stroke(Rgb888::CSS_WHITE, 1);
+        let progress = Line {
+            start: Point::new(36, 17),
+            end: Point::new(adjusted_progress.try_into().unwrap(), 17),
+        };
+        let style = PrimitiveStyle::with_stroke(Rgb888::CSS_WHITE, 1);
 
-            display.draw_line(progress, style)
-        }
+        display.draw_line(progress, style)
     }
 
     fn draw_playing_indicator(&mut self, display: &mut PixelDisplay) {
@@ -215,8 +256,9 @@ impl App for Spotify {
             let _ = self.update_song();
         }
         match &self.current_song {
-            Some(_e) => {
-                // TODO: Text scrolling
+            Some(t) => {
+                // TODO: Text scrolling & Album name
+                display.draw_text(&t.name, Point::new(33, 10));
                 self.draw_progress_bar(display);
             }
             None => display.draw_text(&String::from("Nothing playing"), Point::new(2, 16)),
@@ -225,5 +267,12 @@ impl App for Spotify {
         self.draw_playing_indicator(display);
     }
 
-    fn input(&mut self, _input: Input) {}
+    fn input(&mut self, input: Input) {
+        match input {
+            Input::Next => self.next_track(),
+            Input::Prev => self.previous_track(),
+            Input::Pressed => self.pause_playback(),
+            Input::Held => (),
+        }
+    }
 }
