@@ -1036,9 +1036,11 @@ dependencies = [
  "embedded-graphics 0.8.1",
  "embedded-graphics-simulator",
  "embedded-sprites",
+ "image 0.24.8",
  "rpi-led-panel",
  "rspotify",
  "tinybmp",
+ "ureq",
 ]
 
 [[package]]
@@ -1459,6 +1461,7 @@ dependencies = [
  "base64 0.21.7",
  "cookie",
  "cookie_store",
+ "flate2",
  "log",
  "once_cell",
  "rustls",

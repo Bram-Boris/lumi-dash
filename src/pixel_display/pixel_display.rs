@@ -6,7 +6,6 @@ use embedded_graphics::{
 };
 
 use embedded_graphics::pixelcolor::Rgb888;
-
 use embedded_graphics_simulator::{OutputSettingsBuilder, SimulatorDisplay, Window};
 
 use rpi_led_panel::{Canvas, RGBMatrix, RGBMatrixConfig};
@@ -37,8 +36,12 @@ impl PixelDisplay {
         );
 
         match self.output {
-            DisplayOutput::Real(ref mut c, _) => text.draw(c).ok(),
-            DisplayOutput::Simulator(ref mut s, _) => text.draw(s).ok(),
+            DisplayOutput::Real(ref mut c, _) => {
+                text.draw(c).ok();
+            }
+            DisplayOutput::Simulator(ref mut s, _) => {
+                text.draw(s).ok();
+            }
         };
     }
 
