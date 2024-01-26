@@ -1,7 +1,11 @@
 use std::{path::PathBuf, time::Instant};
 
 use chrono::Duration;
-use embedded_graphics::geometry::Point;
+use embedded_graphics::{
+    geometry::Point,
+    pixelcolor::{Rgb888, WebColors},
+    primitives::{Line, PrimitiveStyle, PrimitiveStyleBuilder, Triangle},
+};
 use image::{codecs::bmp::BmpEncoder, ImageDecoder};
 use rspotify::{
     clients::{BaseClient, OAuthClient},
@@ -61,7 +65,7 @@ impl Spotify {
             current_song: None,
             duration: None,
             progress: None,
-            paused: false,
+            paused: true,
             last_update: Instant::now(),
             cover_raw: None,
             market,
@@ -94,6 +98,7 @@ impl Spotify {
                         self.duration = Some(e.duration);
                         self.current_song = Some(e);
                         if playing.is_playing {
+                            self.progress = playing.progress;
                             self.paused = false
                         } else {
                             self.paused = true
@@ -136,6 +141,67 @@ impl Spotify {
 
         bmpraw
     }
+
+    fn draw_progress_bar(&mut self, display: &mut PixelDisplay) {
+        let duration = Line {
+            start: Point::new(36, 17),
+            end: Point::new(59, 17),
+        };
+
+        let style = PrimitiveStyle::with_stroke(Rgb888::CSS_DARK_GRAY, 1);
+
+        display.draw_line(duration, style);
+
+        let max_seconds = self.duration.unwrap().num_seconds() as f32;
+        let current_seconds = self.progress.unwrap().num_seconds() as f32;
+        let ratio: f32 = current_seconds / max_seconds;
+        let adjusted_progress = ((ratio * (59.0 - 36.0)) + 36.0).round() as i32;
+        if adjusted_progress > 33 {
+            let progress = Line {
+                start: Point::new(36, 17),
+                end: Point::new(adjusted_progress.try_into().unwrap(), 17),
+            };
+            let style = PrimitiveStyle::with_stroke(Rgb888::CSS_WHITE, 1);
+
+            display.draw_line(progress, style)
+        }
+    }
+
+    fn draw_playing_indicator(&mut self, display: &mut PixelDisplay) {
+        match self.paused {
+            false => {
+                let style = PrimitiveStyle::with_stroke(Rgb888::CSS_LIME_GREEN, 2);
+
+                let left = Line {
+                    start: Point::new(45, 22),
+                    end: Point::new(45, 28),
+                };
+                let right = Line {
+                    start: Point::new(48, 22),
+                    end: Point::new(48, 28),
+                };
+                display.draw_line(left, style);
+                display.draw_line(right, style);
+            }
+            true => {
+                let style = PrimitiveStyleBuilder::new()
+                    .stroke_color(Rgb888::CSS_LIME_GREEN)
+                    .stroke_width(1)
+                    .fill_color(Rgb888::CSS_LIME_GREEN)
+                    .build();
+
+                let p1 = Point::new(44, 22);
+                let p2 = Point::new(44, 28);
+                let p3 = Point::new(51, 25);
+
+                let triangle = Triangle {
+                    vertices: [p1, p2, p3],
+                };
+
+                display.draw_triangle(triangle, style);
+            }
+        }
+    }
 }
 
 impl App for Spotify {
@@ -151,10 +217,12 @@ impl App for Spotify {
         match &self.current_song {
             Some(_e) => {
                 // TODO: Text scrolling
-                //display.draw_text(&e.name, Point::new(5, 16))
+                self.draw_progress_bar(display);
             }
             None => display.draw_text(&String::from("Nothing playing"), Point::new(2, 16)),
         }
+
+        self.draw_playing_indicator(display);
     }
 
     fn input(&mut self, _input: Input) {}

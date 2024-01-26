@@ -1,6 +1,7 @@
 use embedded_graphics::image::Image;
 use embedded_graphics::mono_font::iso_8859_14::FONT_4X6;
 
+use embedded_graphics::primitives::{Line, PrimitiveStyle, StyledDrawable, Triangle};
 use embedded_graphics::{
     mono_font::MonoTextStyle, pixelcolor::*, prelude::*, text::Text, Drawable,
 };
@@ -42,6 +43,20 @@ impl PixelDisplay {
             DisplayOutput::Simulator(ref mut s, _) => {
                 text.draw(s).ok();
             }
+        };
+    }
+
+    pub fn draw_line(&mut self, line: Line, style: PrimitiveStyle<Rgb888>) {
+        match self.output {
+            DisplayOutput::Real(ref mut c, _) => line.draw_styled(&style, c).ok(),
+            DisplayOutput::Simulator(ref mut s, _) => line.draw_styled(&style, s).ok(),
+        };
+    }
+
+    pub fn draw_triangle(&mut self, triangle: Triangle, style: PrimitiveStyle<Rgb888>) {
+        match self.output {
+            DisplayOutput::Real(ref mut c, _) => triangle.draw_styled(&style, c).ok(),
+            DisplayOutput::Simulator(ref mut s, _) => triangle.draw_styled(&style, s).ok(),
         };
     }
 
