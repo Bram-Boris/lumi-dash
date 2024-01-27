@@ -6,9 +6,9 @@ use embedded_graphics::{
     pixelcolor::{Rgb888, WebColors},
     primitives::{Line, PrimitiveStyle, PrimitiveStyleBuilder, Triangle},
 };
-use image::{codecs::bmp::BmpEncoder, ImageDecoder};
+use image::codecs::bmp::BmpEncoder;
 use rspotify::{
-    clients::{BaseClient, OAuthClient},
+    clients::OAuthClient,
     model::{AdditionalType, Country, FullTrack, Market},
     scopes, AuthCodeSpotify, Config, Credentials, OAuth, Token,
 };

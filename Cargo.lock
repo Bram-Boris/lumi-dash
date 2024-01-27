@@ -1038,6 +1038,7 @@ dependencies = [
  "embedded-sprites",
  "image 0.24.8",
  "rpi-led-panel",
+ "rppal",
  "rspotify",
  "tinybmp",
  "ureq",
@@ -1054,6 +1055,15 @@ dependencies = [
  "libc",
  "memmap2",
  "thread-priority",
+]
+
+[[package]]
+name = "rppal"
+version = "0.17.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1dc171bbe325b04172e18d917c58c2cf1fb5adfd9ffabb1d6b3d62ba4c1c1331"
+dependencies = [
+ "libc",
 ]
 
 [[package]]

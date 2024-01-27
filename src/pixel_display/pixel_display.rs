@@ -24,8 +24,6 @@ pub enum DisplayOutput {
 
 pub struct PixelDisplay {
     pub output: DisplayOutput,
-    rows: i32,
-    cols: i32,
 }
 
 impl PixelDisplay {
@@ -87,8 +85,6 @@ impl PixelDisplay {
 
                 PixelDisplay {
                     output: DisplayOutput::Real(*canvas, matrix),
-                    rows: rows.try_into().unwrap(),
-                    cols: cols.try_into().unwrap(),
                 }
             }
             DisplayMode::Simulated => {
@@ -98,8 +94,6 @@ impl PixelDisplay {
 
                 PixelDisplay {
                     output: DisplayOutput::Simulator(simulator, window),
-                    rows: rows.try_into().unwrap(),
-                    cols: cols.try_into().unwrap(),
                 }
             }
         }
