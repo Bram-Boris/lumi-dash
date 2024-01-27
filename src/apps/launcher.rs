@@ -20,8 +20,8 @@ impl Launcher {
         let main: Box<MainMenu<'_>> = Box::new(MainMenu::new());
         let spotify: Box<Spotify> = Box::new(Spotify::new());
 
-        apps.push_back(main);
         apps.push_back(spotify);
+        apps.push_back(main);
 
         Self { apps }
     }
