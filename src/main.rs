@@ -25,13 +25,12 @@ fn main() -> Result<(), core::convert::Infallible> {
     #[cfg(feature = "real")]
     let mut pixel_display = PixelDisplay::new(32, 64, DisplayMode::Real);
 
-    #[cfg(feature = "real")]
     let (tx, rx) = mpsc::channel();
 
     #[cfg(feature = "real")]
-    InputHandler::start(tx);
+    InputHandler::start(tx.clone());
 
-    let mut launcher = Launcher::new();
+    let mut launcher = Launcher::new(tx.clone());
     'running: loop {
         pixel_display.update();
         launcher.draw(&mut pixel_display);

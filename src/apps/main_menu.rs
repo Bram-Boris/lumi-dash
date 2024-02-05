@@ -63,4 +63,12 @@ impl App for MainMenu<'_> {
             Input::Held => {}
         }
     }
+
+    fn enable(&mut self) {
+        ()
+    }
+
+    fn disable(&mut self) {
+        ()
+    }
 }

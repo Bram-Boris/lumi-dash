@@ -28,6 +28,7 @@ pub struct Spotify {
     sender: Sender<Input>,
     data: Arc<RwLock<SpotifyData>>,
     prev_data: Option<SpotifyData>,
+    is_rendering: Arc<RwLock<bool>>,
 }
 
 pub struct SpotifyClient {
@@ -50,7 +51,7 @@ pub struct SpotifyData {
 }
 
 impl Spotify {
-    pub fn new() -> Self {
+    pub fn new(input_tx: Sender<Input>) -> Self {
         let creds = Credentials::from_env().unwrap();
 
         let oauth = OAuth {
@@ -112,9 +113,13 @@ impl Spotify {
             sender: tx,
             data: data.clone(),
             prev_data: None,
+            is_rendering: Arc::new(RwLock::new(false)),
         };
 
+        let is_rendering = spotify.is_rendering.clone();
+
         thread::spawn(move || {
+            let input_tx = input_tx.clone();
             let mut elapsed = Instant::now();
             loop {
                 match rx.try_recv() {
@@ -130,6 +135,18 @@ impl Spotify {
                 if elapsed.elapsed().as_secs() > 2 {
                     let new = client.update_data();
                     let mut data = data.write().unwrap();
+                    if data.current_song.is_none()
+                        && new.current_song.is_some()
+                        && !*is_rendering.read().unwrap()
+                    {
+                        input_tx.send(Input::Held);
+                    }
+                    if data.current_song.is_some()
+                        && new.current_song.is_none()
+                        && *is_rendering.read().unwrap()
+                    {
+                        input_tx.send(Input::Held);
+                    }
                     data.current_song = new.current_song;
                     data.duration = new.duration;
                     data.progress = new.progress;
@@ -343,6 +360,16 @@ impl App for Spotify {
 
     fn input(&mut self, input: Input) {
         self.sender.send(input);
+    }
+
+    fn enable(&mut self) {
+        let mut data = self.is_rendering.write().unwrap();
+        *data = true
+    }
+
+    fn disable(&mut self) {
+        let mut data = self.is_rendering.write().unwrap();
+        *data = false
     }
 }
 
