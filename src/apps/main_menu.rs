@@ -9,9 +9,12 @@ use crate::{
 
 use super::{app::App, launcher::Input};
 
-const SAKURA: &[u8; 6282] = include_bytes!("../../assets/sakura-bg.bmp");
-const CLOUD: &[u8; 1186] = include_bytes!("../../assets/cloud-bg.bmp");
-const FOREST: &[u8; 1190] = include_bytes!("../../assets/forest-bg.bmp");
+const SAKURA: &[u8; 6282] = include_bytes!("../../assets/sakura.bmp");
+const CLOUD: &[u8; 1186] = include_bytes!("../../assets/cloud.bmp");
+const FOREST: &[u8; 1190] = include_bytes!("../../assets/forest.bmp");
+const NIGHT: &[u8; 6282] = include_bytes!("../../assets/night.bmp");
+const ART: &[u8; 6282] = include_bytes!("../../assets/art.bmp");
+const OASIS: &[u8; 6282] = include_bytes!("../../assets/oasis.bmp");
 
 pub struct MainMenu<'a> {
     time: Time,
@@ -28,6 +31,9 @@ impl<'a> MainMenu<'a> {
         backgrounds.push_back((Image::new(SAKURA), Point::new(2, 6), Point::new(23, 6)));
         backgrounds.push_back((Image::new(CLOUD), Point::new(32, 6), Point::new(48, 6)));
         backgrounds.push_back((Image::new(FOREST), Point::new(2, 6), Point::new(23, 6)));
+        backgrounds.push_back((Image::new(NIGHT), Point::new(20, 28), Point::new(43, 28)));
+        backgrounds.push_back((Image::new(ART), Point::new(20, 28), Point::new(43, 28)));
+        backgrounds.push_back((Image::new(OASIS), Point::new(20, 28), Point::new(43, 28)));
 
         Self {
             time,

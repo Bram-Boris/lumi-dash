@@ -212,7 +212,7 @@ impl SpotifyClient {
                 },
                 None => self.current_song = None,
             },
-            Err(_) => todo!(),
+            Err(e) => println!("An error has occurred: {}", e),
         }
 
         match self
