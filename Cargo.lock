@@ -743,6 +743,24 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b5e6163cb8c49088c2c36f57875e58ccd8c87c7427f7fbd50ea6710b2f3f2e8f"
 
 [[package]]
+name = "lumi-dash"
+version = "1.0.0"
+dependencies = [
+ "argh",
+ "async-trait",
+ "chrono",
+ "embedded-graphics 0.8.1",
+ "embedded-graphics-simulator",
+ "embedded-sprites",
+ "image 0.24.8",
+ "rpi-led-panel",
+ "rppal",
+ "rspotify",
+ "tinybmp",
+ "ureq",
+]
+
+[[package]]
 name = "malloc_buf"
 version = "0.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1024,24 +1042,6 @@ dependencies = [
  "spin",
  "untrusted",
  "windows-sys 0.48.0",
-]
-
-[[package]]
-name = "rpi-dashboard"
-version = "0.1.0"
-dependencies = [
- "argh",
- "async-trait",
- "chrono",
- "embedded-graphics 0.8.1",
- "embedded-graphics-simulator",
- "embedded-sprites",
- "image 0.24.8",
- "rpi-led-panel",
- "rppal",
- "rspotify",
- "tinybmp",
- "ureq",
 ]
 
 [[package]]
