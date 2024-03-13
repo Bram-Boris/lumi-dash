@@ -12,6 +12,7 @@ chrono = "0.4.31"
 embedded-graphics = "0.8.1" 
 embedded-sprites = "0.1.2"
 image = {version = "0.24.8", features = ["bmp"] }
+rand = "0.8.5"
 rpi-led-panel = { version = "0.5.1"}
 rppal = { version = "0.17.1", optional = true }
 rspotify = { version = "0.12.0", features = ["cli", "client-ureq", "ureq-rustls-tls"], default-features = false }

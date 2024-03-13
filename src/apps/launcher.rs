@@ -23,6 +23,8 @@ impl Launcher {
         apps.push_back(main);
         apps.push_back(spotify);
 
+        apps.front_mut().unwrap().enable();
+
         Self { apps }
     }
 
